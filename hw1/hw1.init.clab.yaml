@@ -1,0 +1,186 @@
+name: hw1
+
+mgmt:
+  external-access: false
+  driver-opts:
+    com.docker.network.bridge.inhibit_ipv4: "true"
+
+topology:
+  kinds:
+    juniper_crpd:
+      image: crpd:23.2R1.13
+      binds:
+        - configs/p2p.hosts:/tmp/clab-p2p.hosts:ro
+        - configs/init.sh:/tmp/init.sh:ro
+      exec:
+        - bash /tmp/init.sh
+    linux:
+      image: nnie-linux
+      binds:
+        - configs/p2p.hosts:/tmp/clab-p2p.hosts:ro
+        - configs/init.sh:/tmp/init.sh:ro
+      exec:
+        - bash /tmp/init.sh
+
+  nodes:
+    jump:
+      kind: linux
+      binds:
+        - configs/init/:/opt/configs/:ro
+        - /etc/ssh/ssh_config.d/:/etc/ssh/ssh_config.d/:ro
+        - jump-host-data/:/opt/jump-host-data/
+    br-a1:
+      kind: juniper_crpd
+      startup-config: configs/init/br-a1.conf
+    rr1:
+      kind: juniper_crpd
+      startup-config: configs/init/rr1.conf
+    core-ym1:
+      kind: juniper_crpd
+      startup-config: configs/init/core-ym1.conf
+    core-ym2:
+      kind: juniper_crpd
+      startup-config: configs/init/core-ym2.conf
+    ym-aggr1:
+      kind: juniper_crpd
+      startup-config: configs/init/ym-aggr1.conf
+    ym-aggr2:
+      kind: juniper_crpd
+      startup-config: configs/init/ym-aggr2.conf
+    br-a2:
+      kind: juniper_crpd
+      startup-config: configs/init/br-a2.conf
+    rr2:
+      kind: juniper_crpd
+      startup-config: configs/init/rr2.conf
+    br-b:
+      kind: juniper_crpd
+      startup-config: configs/init/br-b.conf
+    core-gf1:
+      kind: juniper_crpd
+      startup-config: configs/init/core-gf1.conf
+    core-gf2:
+      kind: juniper_crpd
+      startup-config: configs/init/core-gf2.conf
+    gf-aggr1:
+      kind: juniper_crpd
+      startup-config: configs/init/gf-aggr1.conf
+    gf-aggr2:
+      kind: juniper_crpd
+      startup-config: configs/init/gf-aggr2.conf
+    isp-a1:
+      kind: juniper_crpd
+      startup-config: configs/init/isp-a1.conf
+    isp-a2:
+      kind: juniper_crpd
+      startup-config: configs/init/isp-a2.conf
+    isp-b:
+      kind: juniper_crpd
+      startup-config: configs/init/isp-b.conf
+    isp-c:
+      kind: juniper_crpd
+      startup-config: configs/init/isp-c.conf
+    isp-d:
+      kind: juniper_crpd
+      startup-config: configs/init/isp-d.conf
+    isp-e:
+      kind: juniper_crpd
+      startup-config: configs/init/isp-e.conf
+    ym-sw:
+      kind: bridge
+    gf-sw:
+      kind: bridge
+    campus1:
+      kind: linux
+      exec:
+        - ip addr add 140.113.1.10/24 dev eth1
+        - ip route add default via 140.113.1.254
+    lab:
+      kind: linux
+      exec:
+        - ip addr add 120.126.100.10/24 dev eth1
+        - ip route add default via 120.126.100.254
+    office:
+      kind: linux
+      exec:
+        - ip addr add 140.129.80.10/24 dev eth1
+        - ip route add default via 140.129.80.254
+    campus2:
+      kind: linux
+      exec:
+        - ip addr add 140.113.2.10/24 dev eth1
+        - ip route add default via 140.113.2.254
+    campus3:
+      kind: linux
+      exec:
+        - ip addr add 140.113.3.10/24 dev eth1
+        - ip route add default via 140.113.3.254
+    test1:
+      kind: linux
+      exec:
+        - ip addr add 163.16.0.3/13 dev eth1
+        - ip route add default via 163.23.255.254
+    test2:
+      kind: linux
+      exec:
+        - ip addr add 42.0.64.2/18 dev eth1
+        - ip route add default via 42.0.127.254
+    test3:
+      kind: linux
+      exec:
+        - ip addr add 103.130.252.225/22 dev eth1
+        - ip route add default via 103.130.255.254
+    test4:
+      kind: linux
+      exec:
+        - ip addr add 2.255.248.1/21 dev eth1
+        - ip route add default via 2.255.248.2
+    test5:
+      kind: linux
+      exec:
+        - ip addr add 8.8.8.8/24 dev eth1
+        - ip route add default via 8.8.8.254
+
+  links:
+    - endpoints: ["br-a1:eth1", "core-ym1:eth1"]
+    - endpoints: ["br-a1:eth2", "core-ym2:eth1"]
+    - endpoints: ["rr1:eth1", "core-ym2:eth2"]
+    - endpoints: ["core-ym1:eth2", "ym-aggr1:eth1"]
+    - endpoints: ["core-ym1:eth3", "ym-aggr2:eth1"]
+    - endpoints: ["core-ym2:eth3", "ym-aggr1:eth2"]
+    - endpoints: ["core-ym2:eth4", "ym-aggr2:eth2"]
+    - endpoints: ["core-ym2:eth5", "core-gf1:eth5"]
+    - endpoints: ["br-a2:eth1", "rr2:eth1"]
+    - endpoints: ["br-a2:eth2", "br-b:eth1"]
+    - endpoints: ["br-a2:eth3", "core-gf1:eth1"]
+    - endpoints: ["br-a2:eth4", "core-gf2:eth1"]
+    - endpoints: ["br-b:eth2", "core-gf1:eth2"]
+    - endpoints: ["br-b:eth3", "core-gf2:eth2"]
+    - endpoints: ["core-gf1:eth3", "gf-aggr1:eth1"]
+    - endpoints: ["core-gf1:eth4", "gf-aggr2:eth1"]
+    - endpoints: ["core-gf2:eth3", "gf-aggr1:eth2"]
+    - endpoints: ["core-gf2:eth4", "gf-aggr2:eth2"]
+    - endpoints: ["br-a1:eth3", "isp-a1:eth1"]
+    - endpoints: ["br-a2:eth5", "isp-a2:eth1"]
+    - endpoints: ["br-b:eth4", "isp-b:eth1"]
+    - endpoints: ["isp-a1:eth2", "isp-a2:eth2"]
+    - endpoints: ["isp-a2:eth3", "isp-d:eth1"]
+    - endpoints: ["isp-b:eth2", "isp-d:eth2"]
+    - endpoints: ["isp-b:eth3", "isp-c:eth1"]
+    - endpoints: ["isp-b:eth5", "isp-a2:eth4"]
+    - endpoints: ["isp-d:eth3", "isp-e:eth1"]
+    - endpoints: ["isp-c:eth2", "isp-e:eth2"]
+    - endpoints: ["ym-aggr1:eth3", "ym-sw:ym-aggr1eth3"]
+    - endpoints: ["ym-aggr2:eth3", "ym-sw:ym-aggr2eth3"]
+    - endpoints: ["campus1:eth1", "ym-sw:campus1eth1"]
+    - endpoints: ["gf-aggr1:eth3", "gf-sw:gf-aggr1eth3"]
+    - endpoints: ["gf-aggr2:eth3", "gf-sw:gf-aggr2eth3"]
+    - endpoints: ["lab:eth1", "gf-sw:labeth1"]
+    - endpoints: ["office:eth1", "gf-sw:officeeth1"]
+    - endpoints: ["campus2:eth1", "gf-sw:campus2eth1"]
+    - endpoints: ["campus3:eth1", "gf-sw:campus3eth1"]
+    - endpoints: ["test1:eth1", "isp-a1:eth3"]
+    - endpoints: ["test2:eth1", "isp-b:eth4"]
+    - endpoints: ["test3:eth1", "isp-c:eth3"]
+    - endpoints: ["test4:eth1", "isp-d:eth4"]
+    - endpoints: ["test5:eth1", "isp-e:eth3"]
