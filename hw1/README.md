@@ -132,13 +132,15 @@ Recommended OJ workflow:
 1. Run the `Assign SSH Host` tool to allocate your persistent VM.
 2. Run the `Setup Proxy` tool to generate your SSH key and authorize proxy access to the assigned VM.
 3. Run the `HW1 Setup` tool to deploy or redeploy the HW1 topology on the assigned VM.
-4. Submit to the `Homework 1` problem to grade your current configuration.
+4. If ECMP behavior looks wrong after container restarts or manual debugging, run the `HW1 Init Sysctl` tool to reapply and verify the Linux sysctl settings.
+5. Submit to the `Homework 1` problem to grade your current configuration.
 
 Assigned VM:
 
 - The VM assigned by `Assign SSH Host` is your working environment for HW1.
 - Use the SSH/proxy instructions produced by `Setup Proxy` to connect to the assigned VM.
 - Run `HW1 Setup` again whenever you need to redeploy the HW1 topology from a clean scaffold.
+- Run `HW1 Init Sysctl` when ECMP tests or traceroutes look unstable after container restarts; it reruns `/tmp/init.sh` across the existing `hw1` topology and verifies the sysctl state without redeploying.
 
 Files and persistence:
 
