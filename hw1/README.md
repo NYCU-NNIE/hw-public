@@ -5,6 +5,8 @@
 Build and configure the NYCU network, AS9916, shown in the topology to satisfy the required IGP paths, BGP import and export policies, ECMP behavior, and failover behavior described in this document.
 
 Your final network must meet the required end-to-end traffic behavior under both normal operation and the specified failure scenarios.
+> [!NOTE]
+> You can find the instruction of how to try on the online judge in Secion 2.7
 
 ## 2. Reference Topology and Design
 
@@ -129,6 +131,8 @@ Submit and grade this homework through <https://oj.nnie.tw/>.
 
 Recommended OJ workflow:
 
+> [!NOTE]
+> You can find below operation in `Sidebar` -> `Tools`
 1. Run the `Assign SSH Host` tool to allocate your persistent VM.
 2. Run the `Setup Proxy` tool to generate your SSH key and authorize proxy access to the assigned VM.
 3. Run the `HW1 Setup` tool to deploy or redeploy the HW1 topology on the assigned VM.
