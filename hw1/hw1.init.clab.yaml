@@ -9,6 +9,9 @@ topology:
   kinds:
     juniper_crpd:
       image: crpd:23.2R1.13
+      license: ../crpd.lic
+      sysctls:
+        net.ipv4.icmp_errors_use_inbound_ifaddr: "1"
       binds:
         - configs/p2p.hosts:/tmp/clab-p2p.hosts:ro
         - configs/init.sh:/tmp/init.sh:ro

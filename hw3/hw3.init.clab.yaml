@@ -1,0 +1,240 @@
+name: hw3
+
+mgmt:
+  external-access: false
+  driver-opts:
+    com.docker.network.bridge.inhibit_ipv4: "true"
+
+topology:
+  kinds:
+    juniper_vmx:
+      image: vrnetlab/juniper_vmx:23.2R2-S6.4
+      exec:
+        # Work around a vrnetlab launch race where vcp-int can appear after
+        # the first bridge attach attempt, leaving the RE unable to see vFPC 0.
+        - >-
+          sh -c 'i=0; while [ $i -lt 60 ]; do
+          [ -d /sys/class/net/int_cp ] && [ -d /sys/class/net/vcp-int ] && break;
+          i=$((i+1)); sleep 1;
+          done;
+          [ -d /sys/class/net/vcp-int/brport ] || brctl addif int_cp vcp-int;
+          ip link set vcp-int up'
+    juniper_crpd:
+      image: crpd:23.2R1.13
+      license: ../crpd.lic
+      sysctls:
+        net.ipv4.icmp_errors_use_inbound_ifaddr: "1"
+      binds:
+        - configs/p2p.hosts:/tmp/clab-p2p.hosts:ro
+        - configs/init.sh:/tmp/init.sh:ro
+      exec:
+        - bash /tmp/init.sh
+    linux:
+      image: nnie-linux
+      binds:
+        - configs/p2p.hosts:/tmp/clab-p2p.hosts:ro
+        - configs/init.sh:/tmp/init.sh:ro
+      exec:
+        - bash /tmp/init.sh
+
+  nodes:
+    jump:
+      kind: linux
+      binds:
+        - configs/init/:/opt/configs/:ro
+        - /etc/ssh/ssh_config.d/:/etc/ssh/ssh_config.d/:ro
+        - jump-host-data/:/opt/jump-host-data/
+    pe1:
+      kind: juniper_vmx
+      startup-config: configs/init/pe1.conf
+      enforce-startup-config: true
+    pe2:
+      kind: juniper_crpd
+      startup-config: configs/init/pe2.conf
+    pe3:
+      kind: juniper_vmx
+      startup-config: configs/init/pe3.conf
+      enforce-startup-config: true
+    pe4:
+      kind: juniper_crpd
+      startup-config: configs/init/pe4.conf
+    p1:
+      kind: juniper_crpd
+      startup-config: configs/init/p1.conf
+    p2:
+      kind: juniper_crpd
+      startup-config: configs/init/p2.conf
+    p3:
+      kind: juniper_crpd
+      startup-config: configs/init/p3.conf
+    ce-a1:
+      kind: juniper_crpd
+      startup-config: configs/init/ce-a1.conf
+    ce-a2:
+      kind: juniper_crpd
+      startup-config: configs/init/ce-a2.conf
+    ce-a3:
+      kind: juniper_crpd
+      startup-config: configs/init/ce-a3.conf
+    ce-b1:
+      kind: juniper_crpd
+      startup-config: configs/init/ce-b1.conf
+    ce-b2:
+      kind: juniper_crpd
+      startup-config: configs/init/ce-b2.conf
+    ce-b3:
+      kind: juniper_crpd
+      startup-config: configs/init/ce-b3.conf
+    ce-c1:
+      kind: juniper_crpd
+      startup-config: configs/init/ce-c1.conf
+    upstream-9924:
+      kind: juniper_crpd
+      startup-config: configs/init/upstream-9924.conf
+    upstream-6939:
+      kind: juniper_crpd
+      startup-config: configs/init/upstream-6939.conf
+    host-a1:
+      kind: linux
+      exec:
+        - ip addr add 163.16.10.2/24 dev eth1
+        - ip route replace default via 163.16.10.254
+    host-a2:
+      kind: linux
+      exec:
+        - ip addr add 163.16.11.2/24 dev eth1
+        - ip route replace default via 163.16.11.254
+    host-a3:
+      kind: linux
+      exec:
+        - ip addr add 163.16.12.2/24 dev eth1
+        - ip route replace default via 163.16.12.254
+    host-b1:
+      kind: linux
+      exec:
+        - ip addr add 203.145.192.2/24 dev eth1
+        - ip route replace default via 203.145.192.254
+    host-b2:
+      kind: linux
+      exec:
+        - ip addr add 203.145.193.2/24 dev eth1
+        - ip route replace default via 203.145.193.254
+    host-b3:
+      kind: linux
+      exec:
+        - ip addr add 203.145.194.2/24 dev eth1
+        - ip route replace default via 203.145.194.254
+    host-c1:
+      kind: linux
+      exec:
+        - ip addr add 8.8.8.8/24 dev eth1
+        - ip route replace default via 8.8.8.254
+    host-9924:
+      kind: linux
+      exec:
+        - ip addr add 60.199.128.10/24 dev eth1
+        - ip route replace default via 60.199.128.254
+    host-6939:
+      kind: linux
+      exec:
+        - ip addr add 65.49.2.10/24 dev eth1
+        - ip route replace default via 65.49.2.254
+    a1:
+      kind: linux
+      exec:
+        - ip link set eth1 up
+        - ip link add link eth1 name eth1.100 type vlan id 100
+        - ip addr add 202.5.12.11/24 dev eth1.100
+        - ip link set eth1.100 up
+        - ip route replace default via 202.5.12.254 dev eth1.100
+    b1:
+      kind: linux
+      exec:
+        - ip link set eth1 up
+        - ip link add link eth1 name eth1.100 type vlan id 100
+        - ip link add link eth1 name eth1.200 type vlan id 200
+        - ip addr add 202.5.12.21/24 dev eth1.100
+        - ip addr add 211.76.161.21/24 dev eth1.200
+        - ip link set eth1.100 up
+        - ip link set eth1.200 up
+        - ip route add 202.5.12.0/24 dev eth1.100 src 202.5.12.21 table 100
+        - ip route add 211.76.161.0/24 dev eth1.200 src 211.76.161.21 table 200
+        - ip route add default via 202.5.12.254 dev eth1.100 table 100
+        - ip route add default via 211.76.161.254 dev eth1.200 table 200
+        - ip rule add from 202.5.12.21/32 table 100
+        - ip rule add from 211.76.161.21/32 table 200
+        - ip route replace default via 202.5.12.254 dev eth1.100
+    c1:
+      kind: linux
+      exec:
+        - ip link set eth1 up
+        - ip link add link eth1 name eth1.200 type vlan id 200
+        - ip addr add 211.76.161.11/24 dev eth1.200
+        - ip link set eth1.200 up
+        - ip route replace default via 211.76.161.254 dev eth1.200
+    a2:
+      kind: linux
+      exec:
+        - ip link set eth1 up
+        - ip link add link eth1 name eth1.100 type vlan id 100
+        - ip addr add 202.5.12.12/24 dev eth1.100
+        - ip link set eth1.100 up
+        - ip route replace default via 202.5.12.254 dev eth1.100
+    b2:
+      kind: linux
+      exec:
+        - ip link set eth1 up
+        - ip link add link eth1 name eth1.100 type vlan id 100
+        - ip link add link eth1 name eth1.200 type vlan id 200
+        - ip addr add 202.5.12.22/24 dev eth1.100
+        - ip addr add 211.76.161.22/24 dev eth1.200
+        - ip link set eth1.100 up
+        - ip link set eth1.200 up
+        - ip route add 202.5.12.0/24 dev eth1.100 src 202.5.12.22 table 100
+        - ip route add 211.76.161.0/24 dev eth1.200 src 211.76.161.22 table 200
+        - ip route add default via 202.5.12.254 dev eth1.100 table 100
+        - ip route add default via 211.76.161.254 dev eth1.200 table 200
+        - ip rule add from 202.5.12.22/32 table 100
+        - ip rule add from 211.76.161.22/32 table 200
+        - ip route replace default via 202.5.12.254 dev eth1.100
+    c2:
+      kind: linux
+      exec:
+        - ip link set eth1 up
+        - ip link add link eth1 name eth1.200 type vlan id 200
+        - ip addr add 211.76.161.12/24 dev eth1.200
+        - ip link set eth1.200 up
+        - ip route replace default via 211.76.161.254 dev eth1.200
+
+  links:
+    - endpoints: ["pe1:ge-0/0/0", "p1:eth1"]
+    - endpoints: ["p1:eth2", "p2:eth1"]
+    - endpoints: ["p1:eth3", "p3:eth1"]
+    - endpoints: ["p2:eth2", "p3:eth2"]
+    - endpoints: ["p2:eth3", "pe3:ge-0/0/0"]
+    - endpoints: ["p3:eth3", "pe2:eth1"]
+    - endpoints: ["p3:eth4", "pe4:eth1"]
+    - endpoints: ["pe1:ge-0/0/1", "ce-a1:eth1"]
+    - endpoints: ["pe2:eth2", "ce-a2:eth1"]
+    - endpoints: ["pe3:ge-0/0/1", "ce-a3:eth1"]
+    - endpoints: ["pe1:ge-0/0/2", "ce-b1:eth1"]
+    - endpoints: ["pe3:ge-0/0/2", "ce-b2:eth1"]
+    - endpoints: ["pe4:eth2", "ce-b3:eth1"]
+    - endpoints: ["pe1:ge-0/0/3", "ce-c1:eth1"]
+    - endpoints: ["pe1:ge-0/0/7", "upstream-9924:eth1"]
+    - endpoints: ["pe1:ge-0/0/8", "upstream-6939:eth1"]
+    - endpoints: ["ce-a1:eth2", "host-a1:eth1"]
+    - endpoints: ["ce-a2:eth2", "host-a2:eth1"]
+    - endpoints: ["ce-a3:eth2", "host-a3:eth1"]
+    - endpoints: ["ce-b1:eth2", "host-b1:eth1"]
+    - endpoints: ["ce-b2:eth2", "host-b2:eth1"]
+    - endpoints: ["ce-b3:eth2", "host-b3:eth1"]
+    - endpoints: ["ce-c1:eth2", "host-c1:eth1"]
+    - endpoints: ["upstream-9924:eth2", "host-9924:eth1"]
+    - endpoints: ["upstream-6939:eth2", "host-6939:eth1"]
+    - endpoints: ["pe1:ge-0/0/4", "a1:eth1"]
+    - endpoints: ["pe1:ge-0/0/5", "b1:eth1"]
+    - endpoints: ["pe1:ge-0/0/6", "c1:eth1"]
+    - endpoints: ["pe3:ge-0/0/3", "a2:eth1"]
+    - endpoints: ["pe3:ge-0/0/4", "b2:eth1"]
+    - endpoints: ["pe3:ge-0/0/5", "c2:eth1"]

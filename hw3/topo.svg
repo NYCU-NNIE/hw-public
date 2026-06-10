@@ -1,0 +1,196 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900">
+  <defs>
+    <style>
+      .bg { fill: #f7f8fb; }
+      .zone { fill: #ffffff; stroke: #c8ced8; stroke-width: 2; }
+      .core { fill: #e8f0ff; stroke: #2d5f9a; stroke-width: 2; }
+      .pe { fill: #dff5ee; stroke: #237a57; stroke-width: 2; }
+      .ce { fill: #fff4dd; stroke: #9a6a17; stroke-width: 2; }
+      .transit { fill: #ffe9e3; stroke: #a94d31; stroke-width: 2; }
+      .host { fill: #f2e8ff; stroke: #67419a; stroke-width: 2; }
+      .vx { fill: #e7f7ff; stroke: #1e7496; stroke-width: 2; }
+      .line { stroke: #2d3440; stroke-width: 2.5; fill: none; }
+      .dash { stroke: #1e7496; stroke-width: 2.5; stroke-dasharray: 7 6; fill: none; }
+      .title { font: 700 24px Arial, sans-serif; fill: #1f2733; }
+      .label { font: 700 15px Arial, sans-serif; fill: #1f2733; text-anchor: middle; }
+      .small { font: 10px Arial, sans-serif; fill: #3f4856; text-anchor: middle; }
+      .caption { font: 13px Arial, sans-serif; fill: #3f4856; }
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1200" height="900"/>
+  <text class="title" x="40" y="42">HW3: OSPF + MPLS L3VPN + EVPN/VXLAN</text>
+  <text class="caption" x="40" y="68">Provider AS7539, CUSTOMER-1659 AS1659, CUSTOMER-18426 AS18426, PEER-15169 AS15169, upstream AS9924/AS6939</text>
+
+  <rect class="zone" x="180" y="115" width="740" height="520" rx="8"/>
+  <text class="caption" x="202" y="142">Provider Core: OSPF area 0, MPLS, LDP, MP-BGP</text>
+
+  <rect class="zone" x="50" y="105" width="120" height="360" rx="8"/>
+  <text class="caption" x="70" y="130">POP 1 Services</text>
+  <text class="caption" x="70" y="148">POP 1</text>
+
+  <rect class="zone" x="955" y="105" width="190" height="500" rx="8"/>
+  <text class="caption" x="975" y="130">Remote L3VPN Sites</text>
+
+  <rect class="zone" x="65" y="670" width="350" height="170" rx="8"/>
+  <text class="caption" x="88" y="697">VXLAN POP 1 on pe1</text>
+
+  <rect class="zone" x="35" y="500" width="175" height="130" rx="8"/>
+  <text class="caption" x="55" y="525">PE1 upstreams</text>
+
+  <rect class="zone" x="785" y="670" width="350" height="170" rx="8"/>
+  <text class="caption" x="808" y="697">VXLAN POP 2 on pe3</text>
+
+  <!-- Provider core links -->
+  <line class="line" x1="275" y1="360" x2="430" y2="285"/>
+  <line class="line" x1="430" y1="285" x2="600" y2="245"/>
+  <line class="line" x1="430" y1="285" x2="600" y2="410"/>
+  <line class="line" x1="600" y1="245" x2="600" y2="410"/>
+  <line class="line" x1="600" y1="245" x2="780" y2="300"/>
+  <line class="line" x1="600" y1="410" x2="780" y2="465"/>
+  <line class="line" x1="600" y1="410" x2="780" y2="585"/>
+  <line class="line" x1="225" y1="382" x2="180" y2="555"/>
+  <line class="line" x1="225" y1="390" x2="180" y2="605"/>
+
+  <!-- EVPN overlay -->
+  <path class="dash" d="M 275 385 C 430 615, 645 625, 780 325"/>
+  <text class="caption" x="445" y="610">EVPN VXLAN overlay: VLAN 100/VNI 10100, VLAN 200/VNI 10200</text>
+
+  <!-- Provider nodes -->
+  <g>
+    <rect class="pe" x="225" y="325" width="100" height="70" rx="8"/>
+    <text class="label" x="275" y="353">pe1</text>
+    <text class="small" x="275" y="373">vMX PE + VTEP</text>
+    <text class="small" x="275" y="389">10.255.0.11</text>
+  </g>
+  <g>
+    <rect class="core" x="380" y="250" width="100" height="70" rx="8"/>
+    <text class="label" x="430" y="282">p1</text>
+    <text class="small" x="430" y="302">10.255.0.21</text>
+  </g>
+  <g>
+    <rect class="core" x="550" y="210" width="100" height="70" rx="8"/>
+    <text class="label" x="600" y="242">p2</text>
+    <text class="small" x="600" y="262">10.255.0.22</text>
+  </g>
+  <g>
+    <rect class="core" x="550" y="375" width="100" height="70" rx="8"/>
+    <text class="label" x="600" y="407">p3</text>
+    <text class="small" x="600" y="427">10.255.0.23</text>
+  </g>
+  <g>
+    <rect class="pe" x="760" y="265" width="100" height="70" rx="8"/>
+    <text class="label" x="810" y="293">pe3</text>
+    <text class="small" x="792" y="313">vMX PE/RR + VTEP</text>
+    <text class="small" x="810" y="329">10.255.0.13</text>
+  </g>
+  <g>
+    <rect class="pe" x="760" y="430" width="100" height="70" rx="8"/>
+    <text class="label" x="810" y="462">pe2</text>
+    <text class="small" x="810" y="482">10.255.0.12</text>
+  </g>
+  <g>
+    <rect class="pe" x="760" y="550" width="100" height="70" rx="8"/>
+    <text class="label" x="810" y="582">pe4</text>
+    <text class="small" x="810" y="602">10.255.0.14</text>
+  </g>
+
+  <!-- L3VPN left sites -->
+  <line class="line" x1="170" y1="210" x2="225" y2="340"/>
+  <line class="line" x1="170" y1="310" x2="225" y2="360"/>
+  <line class="line" x1="170" y1="410" x2="225" y2="380"/>
+  <g>
+    <rect class="ce" x="70" y="180" width="90" height="60" rx="8"/>
+    <text class="label" x="115" y="207">ce-a1</text>
+    <text class="small" x="115" y="225">CUSTOMER-1659</text>
+  </g>
+  <g>
+    <rect class="ce" x="70" y="280" width="90" height="60" rx="8"/>
+    <text class="label" x="115" y="307">ce-b1</text>
+    <text class="small" x="115" y="325">CUSTOMER-18426</text>
+  </g>
+  <g>
+    <rect class="ce" x="70" y="380" width="90" height="60" rx="8"/>
+    <text class="label" x="115" y="407">ce-c1</text>
+    <text class="small" x="115" y="425">PEER-15169</text>
+  </g>
+  <g>
+    <rect class="transit" x="55" y="535" width="125" height="45" rx="8"/>
+    <text class="label" x="118" y="560">AS9924</text>
+    <text class="small" x="118" y="575">60.199.128.0/24</text>
+  </g>
+  <g>
+    <rect class="transit" x="55" y="585" width="125" height="45" rx="8"/>
+    <text class="label" x="118" y="610">AS6939</text>
+    <text class="small" x="118" y="625">65.49.2.0/24</text>
+  </g>
+
+  <!-- L3VPN right sites -->
+  <line class="line" x1="860" y1="290" x2="965" y2="210"/>
+  <line class="line" x1="860" y1="315" x2="965" y2="310"/>
+  <line class="line" x1="860" y1="465" x2="965" y2="430"/>
+  <line class="line" x1="860" y1="585" x2="965" y2="540"/>
+  <g>
+    <rect class="ce" x="970" y="180" width="100" height="60" rx="8"/>
+    <text class="label" x="1020" y="207">ce-a3</text>
+    <text class="small" x="1020" y="225">CUSTOMER-1659</text>
+  </g>
+  <g>
+    <rect class="ce" x="970" y="280" width="100" height="60" rx="8"/>
+    <text class="label" x="1020" y="307">ce-b2</text>
+    <text class="small" x="1020" y="325">CUSTOMER-18426</text>
+  </g>
+  <g>
+    <rect class="ce" x="970" y="400" width="100" height="60" rx="8"/>
+    <text class="label" x="1020" y="427">ce-a2</text>
+    <text class="small" x="1020" y="445">CUSTOMER-1659</text>
+  </g>
+  <g>
+    <rect class="ce" x="970" y="510" width="100" height="60" rx="8"/>
+    <text class="label" x="1020" y="537">ce-b3</text>
+    <text class="small" x="1020" y="555">CUSTOMER-18426</text>
+  </g>
+
+  <!-- VXLAN POP hosts -->
+  <line class="line" x1="275" y1="395" x2="140" y2="720"/>
+  <line class="line" x1="275" y1="395" x2="240" y2="720"/>
+  <line class="line" x1="275" y1="395" x2="340" y2="720"/>
+  <g>
+    <rect class="vx" x="95" y="720" width="90" height="60" rx="8"/>
+    <text class="label" x="140" y="747">a1</text>
+    <text class="small" x="140" y="765">VLAN 100</text>
+  </g>
+  <g>
+    <rect class="vx" x="195" y="720" width="90" height="60" rx="8"/>
+    <text class="label" x="240" y="747">b1</text>
+    <text class="small" x="240" y="765">100 + 200</text>
+  </g>
+  <g>
+    <rect class="vx" x="295" y="720" width="90" height="60" rx="8"/>
+    <text class="label" x="340" y="747">c1</text>
+    <text class="small" x="340" y="765">VLAN 200</text>
+  </g>
+  <text class="caption" x="100" y="815">VLAN 100: 202.5.12.0/24, GW .254</text>
+  <text class="caption" x="100" y="835">VLAN 200: 211.76.161.0/24, GW .254</text>
+
+  <line class="line" x1="810" y1="335" x2="860" y2="720"/>
+  <line class="line" x1="810" y1="335" x2="960" y2="720"/>
+  <line class="line" x1="810" y1="335" x2="1060" y2="720"/>
+  <g>
+    <rect class="vx" x="815" y="720" width="90" height="60" rx="8"/>
+    <text class="label" x="860" y="747">a2</text>
+    <text class="small" x="860" y="765">VLAN 100</text>
+  </g>
+  <g>
+    <rect class="vx" x="915" y="720" width="90" height="60" rx="8"/>
+    <text class="label" x="960" y="747">b2</text>
+    <text class="small" x="960" y="765">100 + 200</text>
+  </g>
+  <g>
+    <rect class="vx" x="1015" y="720" width="90" height="60" rx="8"/>
+    <text class="label" x="1060" y="747">c2</text>
+    <text class="small" x="1060" y="765">VLAN 200</text>
+  </g>
+  <text class="caption" x="820" y="815">Same VLANs extend across VXLAN L2.</text>
+  <text class="caption" x="820" y="835">VGA anycast IRB routes to PEER-15169 and 8.8.8.8.</text>
+</svg>
