@@ -117,10 +117,31 @@ Submit and grade this homework through <https://oj.nnie.tw/> when the HW3 proble
 
 Recommended OJ workflow:
 
+> [!NOTE]
+> You can find these operations in `Sidebar` -> `Tools`.
+
 1. Run the `Assign SSH Host` tool to allocate your persistent VM.
-2. Run the `Setup Proxy` tool to generate your SSH key and authorize proxy access to the assigned VM.
-3. Run the `HW3 Setup` tool to deploy or redeploy the HW3 topology on the assigned VM.
-4. Submit to the `Homework 3` problem to grade your current configuration.
+2. Run the `Setup Proxy` tool to generate your SSH key, authorize proxy access, and print connection instructions.
+3. Run the `HW3 Setup` tool to clone, deploy, or redeploy the HW3 topology on the assigned VM.
+4. Wait for the vMX routers (`pe1` and `pe3`) to finish booting. Use `HW3 Status` to check containerlab status and vMX FPC state.
+5. If `ssh user@pe1` or `ssh user@pe3` fails after vMX boot completes, run `HW3 Provision vMX SSH` to install your existing `Setup Proxy` SSH key on the vMX routers.
+6. Submit to the `Homework 3` problem to grade your current configuration.
+
+Assigned VM and tools:
+
+- The VM assigned by `Assign SSH Host` is your working environment for HW3.
+- Use the SSH/proxy instructions printed by `Setup Proxy` to connect to the assigned VM.
+- Run `HW3 Setup` again whenever you need to redeploy the HW3 topology from a clean scaffold. It can take several minutes because HW3 builds `nnie-linux` and starts vMX nodes.
+- Run `HW3 Status` anytime to inspect the existing deployment. This is the safest first check when vMX access or protocols look unavailable.
+- Run `HW3 Provision vMX SSH` after vMX is ready if student SSH access to `pe1` or `pe3` is missing. This tool does not redeploy; it only installs the existing student SSH key created by `Setup Proxy`.
+- Run `HW3 Restart All` only when you need to restart the existing HW3 containers. After restart, use `HW3 Status` and rerun `HW3 Provision vMX SSH` if vMX SSH access is lost.
+
+Files and persistence:
+
+- Initial router configuration files are mounted into the `jump` host at `/opt/configs/` read-only.
+- The `jump` host has writable persistent storage at `/opt/jump-host-data/`.
+- Use `/opt/jump-host-data/` for notes, temporary scripts, logs, and other data that should survive topology redeploys when needed.
+- Do not use `/opt/configs/` as writable working storage.
 
 Local deploy workflow from the repo root:
 
@@ -135,8 +156,6 @@ ssh user@jump
 ssh user@pe1
 ssh user@host-a1
 ```
-
-Initial router configuration files are mounted into the `jump` host at `/opt/configs/` read-only. Writable persistent storage is available at `/opt/jump-host-data/`.
 
 ## 3. Addressing
 
