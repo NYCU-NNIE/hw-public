@@ -2,8 +2,6 @@ name: hw3
 
 mgmt:
   external-access: false
-  driver-opts:
-    com.docker.network.bridge.inhibit_ipv4: "true"
 
 topology:
   kinds:
